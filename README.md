@@ -11,5 +11,5 @@
   * Command: flask run
 
 ## Maintenance
-  * .gitignore will prevent git from pushing dependencies in virtual envirnoment **venv**, python cache files or .vscode settings
+  * .gitignore will prevent git from pushing dependencies in virtual environment **venv**, python cache files or .vscode settings
   * use the following to add pip installed dependencies to the requirements file instead: **pip freeze requirements.txt**

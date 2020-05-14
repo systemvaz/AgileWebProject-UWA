@@ -4,14 +4,14 @@ from werkzeug.urls import url_parse
 
 from app import app
 from app.models import User
-from app.forms import LoginForm
+from app.forms import LoginForm, NewQuizForm
 
 @app.route('/')
 @app.route('/index')
 def index():
     return render_template('index.html', title='Home')
 
-
+# Routes for login and logout
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     if current_user.is_authenticated:
@@ -37,3 +37,29 @@ def login():
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
+
+# ------------------------
+# Administrator routes
+# ------------------------
+
+@app.route('/admin')
+def admin():
+    if current_user.is_anonymous or current_user.is_admin != True:
+        return redirect(url_for('index')) 
+    
+    return render_template('/admin/index.html', title='Administrator Panel')
+
+# Route to create new QnA set: admin/newqna
+@app.route('/admin/new_quiz', methods=['GET', 'POST'])
+def admin_newquiz():
+    if current_user.is_anonymous or current_user.is_admin != True:
+        return redirect(url_for('index'))   
+
+    form = NewQuizForm()
+    if form.validate_on_submit():
+        for q in form.questions.data:
+            print(q, flush=True)
+        flash(form.questions.data)
+
+    return render_template('/admin/newquiz.html', title='Create a new Quiz!', form=form)

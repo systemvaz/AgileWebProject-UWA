@@ -3,7 +3,8 @@ from flask_login import current_user, login_user, logout_user
 from werkzeug.urls import url_parse
 
 from app import app
-from app.models import User
+from app import db
+from app.models import User, Qset, Question, Multichoice
 from app.forms import LoginForm, NewQuizForm
 
 @app.route('/')
@@ -43,6 +44,7 @@ def logout():
 # Administrator routes
 # ------------------------
 
+# Route to Administrator panel
 @app.route('/admin')
 def admin():
     if current_user.is_anonymous or current_user.is_admin != True:
@@ -50,19 +52,67 @@ def admin():
     
     return render_template('/admin/index.html', title='Administrator Panel')
 
-# Route to create new QnA set: admin/newqna
+
+# Route to create new QnA set: admin/new_quiz
 @app.route('/admin/new_quiz', methods=['GET', 'POST'])
 def admin_newquiz():
     if current_user.is_anonymous or current_user.is_admin != True:
         return redirect(url_for('index'))   
 
     form = NewQuizForm()
-    i = 0
-    if not form.validate_on_submit():
-        for q in form.questions.data:
-            print(q, flush=True)
-        for a in form.answers.data:
-            print(a, flush=True)
+    if form.validate_on_submit():
+        # Commit new quiz to Qset and obtain PK
+        qset = Qset(title=form.title.data, is_active=True)
+        db.session.add(qset)
+        db.session.commit()
+        qset = Qset.query.filter_by(title=form.title.data).first()
+        qset_id = qset.id
+        
+        i = 0
+        for q in form.questions:
+            print(q.multichoice.data, flush=True)
+            if q.multichoice.data == 'True':
+                # Adding Multiple Choice question to Question table. Commit and get PK
+                question = Question(qset_id=qset_id, question=q.question.data, is_multichoice=True)
+                db.session.add(question)
+                db.session.commit()
+                question = Question.query.filter_by(question=q.question.data).first()
+                question_id = question.id
+
+                ans = form.answers[i]
+                correct = int(ans.correct.data)
+                set_correct = False
+                # Adding multichoice answer 1 to Multichoice table
+                print('Adding answer 1: {}'.format(ans.answer1.data))
+                if correct == 0: set_correct = True
+                else: set_correct = False
+                mc = Multichoice(question_id=question_id, answer_selection=ans.answer1.data, is_correct=set_correct)
+                db.session.add(mc)
+                # Adding multichoice answer 2 to Multichoice table
+                print('Adding answer 2: {}'.format(ans.answer2.data))
+                if correct == 1: set_correct = True
+                else: set_correct = False
+                mc = Multichoice(question_id=question_id, answer_selection=ans.answer2.data, is_correct=set_correct)
+                db.session.add(mc)
+                # Adding multichoice answer 3 to Multichoice table
+                print('Adding answer 3: {}'.format(ans.answer3.data))
+                if correct == 2: set_correct = True
+                else: set_correct = False
+                mc = Multichoice(question_id=question_id, answer_selection=ans.answer3.data, is_correct=set_correct)
+                db.session.add(mc)
+                # Adding multichoice answer 4 to Multichoice table
+                print('Adding answer 4: {}'.format(ans.answer4.data))
+                if correct == 3: set_correct = True
+                else: set_correct = False
+                mc = Multichoice(question_id=question_id, answer_selection=ans.answer4.data, is_correct=set_correct)
+                db.session.add(mc)
+                db.session.commit()
+                i = i + 1
+            elif q.multichoice.data == 'False':
+                # Adding Non-Multichoice question to Question table
+                question = Question(qset_id=qset_id, question=q.question.data, is_multichoice=False)
+                db.session.add(question)
+                db.commit()
 
         flash(form.questions.data + form.answers.data)
 

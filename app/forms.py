@@ -11,19 +11,24 @@ class LoginForm(FlaskForm):
 
 # Administrator forms
 class MultiChoiceForm(FlaskForm):
-    answer1 = StringField('Answer 1')
-    answer2 = StringField('Answer 2')
-    answer3 = StringField('Answer 3')
-    answer4 = StringField('Answer 4')
-    correct = StringField('Correct Answer')
+    class Meta:
+        csrf = False
+    answer1 = StringField('Answer 1', validators=[DataRequired()])
+    answer2 = StringField('Answer 2', validators=[DataRequired()])
+    answer3 = StringField('Answer 3', validators=[DataRequired()])
+    answer4 = StringField('Answer 4', validators=[DataRequired()])
+    correct = StringField('Correct Answer', validators=[DataRequired()])
 
 class QuestionsForm(FlaskForm):
-    question = StringField('Question')
-    multichoice  = StringField('Multichoice')
+    class Meta:
+        csrf = False
+    question = StringField('Question', validators=[DataRequired()])
+    multichoice  = StringField('Multichoice', validators=[DataRequired()])
 
 class NewQuizForm(FlaskForm):
+    class Meta:
+        csrf = False
     title = StringField('Quiz Title', validators=[DataRequired()])
-    # questions = FieldList(StringField('Question', validators=[DataRequired()]), min_entries=1)
-    questions = FieldList(FormField(QuestionsForm), min_entries=1, max_entries=4, validators=None)
-    answers = FieldList(FormField(MultiChoiceForm), min_entries=1, max_entries=4, validators=None)
+    questions = FieldList(FormField(QuestionsForm), min_entries=1, validators=None)
+    answers = FieldList(FormField(MultiChoiceForm), min_entries=1, validators=None)
     submit = SubmitField('Create Quiz!')

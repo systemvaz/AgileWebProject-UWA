@@ -57,9 +57,13 @@ def admin_newquiz():
         return redirect(url_for('index'))   
 
     form = NewQuizForm()
-    if form.validate_on_submit():
+    i = 0
+    if not form.validate_on_submit():
         for q in form.questions.data:
             print(q, flush=True)
-        flash(form.questions.data)
+        for a in form.answers.data:
+            print(a, flush=True)
+
+        flash(form.questions.data + form.answers.data)
 
     return render_template('/admin/newquiz.html', title='Create a new Quiz!', form=form)

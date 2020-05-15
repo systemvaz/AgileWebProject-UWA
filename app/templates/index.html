@@ -3,4 +3,8 @@
 {% block content %}
     <h1>Hi, {{ current_user.username }}</h1>
     <h1>Hack the planet!</h1>
+
+    <ul>
+        <li><a href="{{ url_for('view_quizes') }}">View available quizes!</a></li>
+    </ul>
 {% endblock %}

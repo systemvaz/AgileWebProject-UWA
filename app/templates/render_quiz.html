@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="jumbotron">
+    <h1>QUIZ: {{ quiz.title }}</h1>
+</div>
+
+{% set count_q = namespace(value=1) %}
+{% set count_mc = namespace(value=0) %}
+
+{% for q in questions %}
+    <h2>Question #{{ count_q.value }}:</h2>
+    <h4>{{ q.question }}</h3>
+
+    {% if q.is_multichoice %}
+        {% for q in multichoice[count_mc.value] %}
+            <p>{{ q.answer_selection }} <input type="radio" name="answ_for_q{{ count_q.value }}"></p>
+        {% endfor %}
+        {% set count_mc.value = count_mc.value + 1 %}
+    {% else %}
+
+    {% endif %}
+
+    {% set count_q.value = count_q.value + 1 %}
+{% endfor %}
+
+{% endblock %}

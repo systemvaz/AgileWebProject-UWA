@@ -41,6 +41,33 @@ def logout():
 
 
 # ------------------------
+# Quiz routes
+# ------------------------
+
+# Route to view available Quizes
+@app.route('/view_quizes')
+def view_quizes():
+    quizes = Qset.query.all()
+    flash(quizes)
+    return render_template('view_quizes.html', title='Available Quizes', quizes=quizes)
+
+
+# Route to take user to a quiz
+@app.route('/take_quiz')
+def take_quiz():
+    qset_id = request.args.get('quiz')
+    qset = Qset.query.filter_by(id=qset_id).first()
+    questions = Question.query.filter_by(qset_id=int(qset_id)).all()
+    multichoice = []
+
+    for q in questions:
+        if q.get_multichoice:
+            multichoice.append(Multichoice.query.filter_by(question_id=q.id).all())
+    
+    return render_template('render_quiz.html', title='Take this Quiz', quiz=qset, questions=questions, multichoice=multichoice)
+
+
+# ------------------------
 # Administrator routes
 # ------------------------
 

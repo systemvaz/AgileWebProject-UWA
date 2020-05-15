@@ -39,6 +39,9 @@ class Question(db.Model):
     question = db.Column(db.String(256))
     is_multichoice = db.Column(db.Boolean)
 
+    def get_multichoice(self):
+        return self.is_multichoice
+
 class Multichoice(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     question_id = db.Column(db.Integer, db.ForeignKey('question.id'))

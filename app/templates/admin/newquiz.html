@@ -3,8 +3,9 @@
 {% block content %}
 
 <script src="/static/js/newquiz.js"></script>
-
-<h1>Create a new Quiz</h1>
+<div class="jumbotron">
+    <h1>Create a new Quiz</h1>
+</div>
 
 <form action="" method="post" novalidate>
     {{ form.hidden_tag() }}
@@ -17,9 +18,9 @@
     
     <div id='dynamicAdd'></div>
     <br>
-    <button type='button' onclick='add_question()'>Add Question</button><br>
+    <button type="button" class="btn btn-primary" onclick="add_question()">Add Question</button><br>
     <hr>
-    <p>{{ form.submit() }}</p>
+    <p>{{ form.submit(class="btn btn-primary btn-block", style="background-color: green") }}</p>
 </form>
 
 {% endblock %}

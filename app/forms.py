@@ -9,7 +9,11 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Sign In')
 
 
+# ------------------------------------
 # Administrator forms
+# ------------------------------------
+
+# Start: /admin/new_quiz forms
 class MultiChoiceForm(FlaskForm):
     class Meta:
         csrf = False
@@ -32,3 +36,4 @@ class NewQuizForm(FlaskForm):
     questions = FieldList(FormField(QuestionsForm), min_entries=1, validators=None)
     answers = FieldList(FormField(MultiChoiceForm), min_entries=1, validators=None)
     submit = SubmitField('Create Quiz!')
+# End: /admin/new_quiz forms

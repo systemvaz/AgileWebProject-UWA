@@ -139,7 +139,7 @@ def admin_newquiz():
                 # Adding Non-Multichoice question to Question table
                 question = Question(qset_id=qset_id, question=q.question.data, is_multichoice=False)
                 db.session.add(question)
-                db.commit()
+                db.session.commit()
 
         flash(form.questions.data + form.answers.data)
 

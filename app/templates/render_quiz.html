@@ -17,11 +17,11 @@
         {% for q in multichoice[count_mc.value] %}
             <p>{{ q.answer_selection }} <input type="radio" name="answ_for_q{{ count_q.value }}"></p>
         {% endfor %}
-        {% set count_mc.value = count_mc.value + 1 %}
     {% else %}
-
+        <textarea name="answer_for_q{{ count_q.value }}"></textarea>
     {% endif %}
-
+    <hr>
+    {% set count_mc.value = count_mc.value + 1 %}
     {% set count_q.value = count_q.value + 1 %}
 {% endfor %}
 

@@ -1,8 +1,8 @@
-"""proposed schema
+"""initialise all tables
 
-Revision ID: e2f94e7ec9a3
+Revision ID: bcbea71ebf2a
 Revises: 
-Create Date: 2020-05-12 17:17:36.093439
+Create Date: 2020-05-16 18:05:07.710044
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'e2f94e7ec9a3'
+revision = 'bcbea71ebf2a'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -30,6 +30,8 @@ def upgrade():
     sa.Column('first_name', sa.String(length=64), nullable=True),
     sa.Column('last_name', sa.String(length=64), nullable=True),
     sa.Column('email', sa.String(length=120), nullable=True),
+    sa.Column('about_me', sa.String(length=140), nullable=True),
+    sa.Column('last_seen', sa.DateTime(), nullable=True),
     sa.Column('password_hash', sa.String(length=128), nullable=True),
     sa.Column('is_admin', sa.Boolean(), nullable=True),
     sa.PrimaryKeyConstraint('id')
@@ -66,12 +68,16 @@ def upgrade():
     op.create_table('results',
     sa.Column('id', sa.Integer(), nullable=False),
     sa.Column('user_id', sa.Integer(), nullable=True),
+    sa.Column('qset_id', sa.Integer(), nullable=True),
+    sa.Column('attempt_id', sa.Integer(), nullable=True),
     sa.Column('question_id', sa.Integer(), nullable=True),
     sa.Column('answer_txt', sa.String(length=256), nullable=True),
     sa.Column('answer_mc', sa.Integer(), nullable=True),
     sa.Column('is_needs_review', sa.Boolean(), nullable=True),
     sa.Column('is_correct', sa.Boolean(), nullable=True),
     sa.ForeignKeyConstraint(['answer_mc'], ['multichoice.id'], ),
+    sa.ForeignKeyConstraint(['attempt_id'], ['attempts.id'], ),
+    sa.ForeignKeyConstraint(['qset_id'], ['qset.id'], ),
     sa.ForeignKeyConstraint(['question_id'], ['question.id'], ),
     sa.ForeignKeyConstraint(['user_id'], ['user.id'], ),
     sa.PrimaryKeyConstraint('id')

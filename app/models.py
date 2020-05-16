@@ -25,6 +25,8 @@ class User(UserMixin, db.Model):
     def avatar(self, size):
         digest = md5(self.email.lower().encode('utf-8')).hexdigest()
         return 'https://www.gravatar.com/avatar/{}?d=identicon&s={}'.format(digest, size)
+    def get_id(self):
+        return self.id
     def __repr__(self):
         return '<User: {}>'.format(self.username)
 
@@ -58,6 +60,8 @@ class Attempts(db.Model):
 class Results(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
+    qset_id = db.Column(db.Integer, db.ForeignKey('qset.id'))
+    attempt_id = db.Column(db.Integer, db.ForeignKey('attempts.id'))
     question_id = db.Column(db.Integer, db.ForeignKey('question.id'))
     answer_txt = db.Column(db.String(256))
     answer_mc = db.Column(db.Integer, db.ForeignKey('multichoice.id'))

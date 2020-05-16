@@ -9,6 +9,19 @@ class LoginForm(FlaskForm):
     submit = SubmitField('Sign In')
 
 
+# Forms for taking a quiz
+class TakeQuizAnswerForm(FlaskForm):
+    class Meta:
+        csrf = False
+    answer = StringField('Answer', validators=[DataRequired()])
+
+class TakeQuizForm(FlaskForm):
+    class Meta:
+        csrf = False
+    answer_for_q = FieldList(FormField(TakeQuizAnswerForm), min_entries=1, validators=None)
+    submit = SubmitField('Submit Your Answers!')
+
+
 # ------------------------------------
 # Administrator forms
 # ------------------------------------

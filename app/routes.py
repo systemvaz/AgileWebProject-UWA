@@ -1,11 +1,12 @@
 from flask import render_template, flash, redirect, url_for, request
 from flask_login import current_user, login_user, logout_user
 from werkzeug.urls import url_parse
+from datetime import datetime
 
 from app import app
 from app import db
-from app.models import User, Qset, Question, Multichoice
-from app.forms import LoginForm, NewQuizForm
+from app.models import User, Qset, Question, Multichoice, Results, Attempts
+from app.forms import LoginForm, NewQuizForm, TakeQuizForm
 
 @app.route('/')
 @app.route('/index')
@@ -44,27 +45,62 @@ def logout():
 # Quiz routes
 # ------------------------
 
-# Route to view available Quizes
+# Route to view available active Quizes
 @app.route('/view_quizes')
 def view_quizes():
-    quizes = Qset.query.all()
-    flash(quizes)
+    quizes = Qset.query.filter_by(is_active=True).all()
     return render_template('view_quizes.html', title='Available Quizes', quizes=quizes)
 
 
 # Route to take user to a quiz
-@app.route('/take_quiz')
+@app.route('/take_quiz', methods=['GET', 'POST'])
 def take_quiz():
+    # Get current user PK
+    user_id = current_user.get_id()
+    # Get the Qset id passed to route as args
     qset_id = request.args.get('quiz')
     qset = Qset.query.filter_by(id=qset_id).first()
+    # Get all questions via FK
     questions = Question.query.filter_by(qset_id=int(qset_id)).all()
     multichoice = []
 
+    # Get all related multichoice answers via FK 
     for q in questions:
         if q.get_multichoice:
             multichoice.append(Multichoice.query.filter_by(question_id=q.id).all())
+
+    form = TakeQuizForm()
+    review_flag = False
+    i = 0
+
+    # Check submitted answers and add to Results table
+    if form.validate_on_submit():        
+        # Add an entry to the Attempts table and get id PK for Result FK
+        attempt = Attempts(user_id=user_id, qset_id=qset_id, timestamp=datetime.utcnow())
+        db.session.add(attempt)
+        db.session.commit()
+        attempt_id = attempt.id   
+        for q in questions:
+            if q.get_multichoice():
+                # Check if multichoice answer is correct or not and add results to Result table
+                mc_id = form.answer_for_q[i].data.get("answer")
+                mc = Multichoice.query.filter_by(id=mc_id).first()
+                is_correct = mc.is_correct
+                result = Results(user_id=user_id, qset_id=qset_id, attempt_id=attempt_id, question_id=q.id, answer_mc=mc_id, answer_txt=None, is_needs_review=False, is_correct=is_correct)
+                # print("{} | {} | {} | {} | {} | {} | {}".format(result.user_id, result.qset_id, result.question_id, result.answer_mc, result.answer_txt, result.is_needs_review, result.is_correct), flush=True)
+                db.session.add(result)
+                db.session.commit()
+            elif not q.get_multichoice():
+                # Not multichoice so needs to be flagged for admin review. Add to Result table
+                review_flag = True
+                answer_txt = form.answer_for_q[i].data.get("answer")
+                result = Results(user_id=user_id, qset_id=qset_id, attempt_id=attempt_id, question_id=q.id, answer_mc=None, answer_txt=answer_txt, is_needs_review=True, is_correct=None)
+                # print("{} | {} | {} | {} | {} | {} | {}".format(result.user_id, result.qset_id, result.question_id, result.answer_mc, result.answer_txt, result.is_needs_review, result.is_correct), flush=True)
+                db.session.add(result)
+                db.session.commit()
+            i += 1     
     
-    return render_template('render_quiz.html', title='Take this Quiz', quiz=qset, questions=questions, multichoice=multichoice)
+    return render_template('render_quiz.html', title='Take this Quiz', quiz=qset, questions=questions, multichoice=multichoice, form=form)
 
 
 # ------------------------
@@ -140,6 +176,8 @@ def admin_newquiz():
                 question = Question(qset_id=qset_id, question=q.question.data, is_multichoice=False)
                 db.session.add(question)
                 db.session.commit()
+
+        return redirect(url_for('admin'))
 
         flash(form.questions.data + form.answers.data)
 

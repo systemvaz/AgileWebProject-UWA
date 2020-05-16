@@ -1,8 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Hi, {{ current_user.username }}</h1>
-    <h1>Hack the planet!</h1>
+
+    <div class="jumbotron">
+        <h1>Hack the planet!</h1>
+        <h1>Hi, {{ current_user.username }}</h1>
+    </div>
 
     <ul>
         <li><a href="{{ url_for('view_quizes') }}">View available quizes!</a></li>

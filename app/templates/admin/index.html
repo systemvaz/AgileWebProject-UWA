@@ -1,7 +1,11 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Administrator Panel</h1>
+
+<div class="jumbotron">
+    <h1>Administrator Panel</h1>
+</div>
+
 <ul>
     <li><a href="{{ url_for('admin_newquiz') }}">Create a new Quiz</a></li>
 </ul>

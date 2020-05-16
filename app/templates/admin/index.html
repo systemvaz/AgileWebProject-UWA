@@ -26,7 +26,7 @@
                 <td>{{ review_qset[count.value] }}</td>
                 <td>{{ review_users[count.value] }}</td>
                 <td>{{ q.timestamp }}</td>
-                <td><a href={{ url_for('admin_reviewquiz') }}>Review</a></td>
+                <td><a href="{{ url_for('admin_reviewquiz') }}?attempt={{ q.id }}&user={{ review_users[count.value] }}">Review</a></td>
             </tr>
         {% endfor %}
     </table>

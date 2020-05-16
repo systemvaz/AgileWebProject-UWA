@@ -30,17 +30,17 @@ class TakeQuizForm(FlaskForm):
 class MultiChoiceForm(FlaskForm):
     class Meta:
         csrf = False
-    answer1 = StringField('Answer 1', validators=[DataRequired()])
-    answer2 = StringField('Answer 2', validators=[DataRequired()])
-    answer3 = StringField('Answer 3', validators=[DataRequired()])
-    answer4 = StringField('Answer 4', validators=[DataRequired()])
-    correct = StringField('Correct Answer', validators=[DataRequired()])
+    answer1 = StringField('Answer 1')
+    answer2 = StringField('Answer 2')
+    answer3 = StringField('Answer 3')
+    answer4 = StringField('Answer 4')
+    correct = StringField('Correct Answer')
 
 class QuestionsForm(FlaskForm):
     class Meta:
         csrf = False
-    question = StringField('Question', validators=[DataRequired()])
-    multichoice  = StringField('Multichoice', validators=[DataRequired()])
+    question = StringField('Question')
+    multichoice  = StringField('Multichoice')
 
 class NewQuizForm(FlaskForm):
     class Meta:

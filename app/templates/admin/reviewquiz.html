@@ -2,4 +2,63 @@
 
 {% block content %}
 
+<script>
+    function setDivColour(colour, ourdiv)
+    {
+        colourdiv = document.getElementById(ourdiv)
+        colourdiv.setAttribute("style", "background-color: " + colour + ";")
+    }
+</script>
+
+<div class="jumbotron">
+    <h1>REVIEW QUIZ: {{ qset }}</h1>
+</div>
+
+<h4>User: {{ user }}</h4>
+<h4>Quiz taken: {{ timestamp }}</h4>
+<hr>
+
+{% set count = namespace(value=0) %}
+{% set mc_count = namespace(value=0) %}
+
+<form action="" method="post" novalidate>
+    {% for q in questions %}
+
+        <div id="view-question-{{ count.value }}">
+            <h2>Question #{{ count.value + 1 }}:</h2>
+            <h4>{{ q.question }}</h4>
+        </div>
+
+        {% if q.is_multichoice %}
+            <p>{{ mc_txt[mc_count.value] }}</p>
+            {% set mc_count.value = mc_count.value + 1 %}
+            {% if answers[count.value].is_correct %}
+                <p style="color: green;">Correct Multiple Choice Answer</p>
+            {% else %}
+                <p style="color: red;">Incorrect Multiple Choice Answer</p>
+            {% endif %}
+        
+        {% else %}   
+            <p>{{ answers[count.value].answer_txt }}</p>
+            {% if answers[count.value].is_correct %}
+                <p style="color: green;">Marked Correct</p>
+            {% elif answers[count.value].is_correct == False %}
+                <p style="color: red;">Marked Incorrect</p>
+            {% endif %}
+
+            {% if answers[count.value].is_needs_review %}
+                <script>setDivColour("orange", "view-question-{{ count.value }}")</script> 
+                <p>
+                    <button style="background-color: green; color: white;" value="{{ q.id }}" name="markCorrect">Mark Correct</button> 
+                    <button style="background-color: red; color: white;" value="{{ q.id }}" name="markWrong">Mark Wrong</button>
+                </p>
+            {% endif %}
+
+        {% endif %}
+        <hr>
+        {% set count.value = count.value + 1 %}
+
+    {% endfor %}
+</form>
+
 {% endblock %}

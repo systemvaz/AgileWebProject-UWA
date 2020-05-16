@@ -54,6 +54,7 @@ class Attempts(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('user.id'))
     qset_id = db.Column(db.Integer, db.ForeignKey('qset.id'))
+    is_needs_review = db.Column(db.Boolean)
     timestamp = db.Column(db.DateTime, index=True, default=datetime.utcnow)
 
 # DB Fact table

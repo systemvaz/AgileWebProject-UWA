@@ -10,4 +10,27 @@
     <li><a href="{{ url_for('admin_newquiz') }}">Create a new Quiz</a></li>
 </ul>
 
+<hr><br>
+<h3>Quizes needing review:</h3>
+<div class="table-responsive">
+    <table class="table">
+        <tr>
+            <th>Question Set</th>
+            <th>User</th>
+            <th>Timestamp</th>
+            <th>Review Link</th>
+        </tr>
+        {% set count = namespace(value=0) %}
+        {% for q in review_quizes %}
+            <tr>
+                <td>{{ review_qset[count.value] }}</td>
+                <td>{{ review_users[count.value] }}</td>
+                <td>{{ q.timestamp }}</td>
+                <td><a href={{ url_for('admin_reviewquiz') }}>Review</a></td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+
+
 {% endblock %}

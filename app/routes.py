@@ -98,7 +98,11 @@ def take_quiz():
                 # print("{} | {} | {} | {} | {} | {} | {}".format(result.user_id, result.qset_id, result.question_id, result.answer_mc, result.answer_txt, result.is_needs_review, result.is_correct), flush=True)
                 db.session.add(result)
                 db.session.commit()
-            i += 1     
+            i += 1
+
+            attempt.is_needs_review = review_flag
+            db.session.add(attempt)
+            db.session.commit()     
     
     return render_template('render_quiz.html', title='Take this Quiz', quiz=qset, questions=questions, multichoice=multichoice, form=form)
 
@@ -112,8 +116,19 @@ def take_quiz():
 def admin():
     if current_user.is_anonymous or current_user.is_admin != True:
         return redirect(url_for('index')) 
+
+    # Get all quizes needing administrator review
+    review_quizes = Attempts.query.filter_by(is_needs_review=True).all()
+    # Get user and question set info for these
+    review_user = []
+    review_qset = []
+    for r in review_quizes:
+        userquery = User.query.filter_by(id=r.user_id).first()
+        review_user.append(userquery.username)
+        qsetquery = Qset.query.filter_by(id=r.qset_id).first()
+        review_qset.append(qsetquery.title)
     
-    return render_template('/admin/index.html', title='Administrator Panel')
+    return render_template('/admin/index.html', title='Administrator Panel', review_quizes=review_quizes, review_users=review_user, review_qset=review_qset)
 
 
 # Route to create new QnA set: admin/new_quiz
@@ -179,6 +194,9 @@ def admin_newquiz():
 
         return redirect(url_for('admin'))
 
-        flash(form.questions.data + form.answers.data)
-
     return render_template('/admin/newquiz.html', title='Create a new Quiz!', form=form)
+
+@app.route('/admin/review_quiz')
+def admin_reviewquiz():
+
+    return render_template('admin/reviewquiz.html', title="Review this Quiz")

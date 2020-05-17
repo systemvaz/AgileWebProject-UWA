@@ -8,34 +8,45 @@
     <title>Welcome to the project</title>
     {% endif %}
 
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap.min.css">
+    <link href="//netdna.bootstrapcdn.com/bootstrap/3.4.1/css/bootstrap-glyphicons.css" rel="stylesheet">
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js"></script> 
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.4.1/js/bootstrap.min.js"></script>
     </head>
 
     <body>
-        <div>
-            Agile Web Project:
-            <a href="{{ url_for('index') }}">Home</a>
-            {% if current_user.is_anonymous %}
-                <a href="{{ url_for('login') }}">Login</a>
-            {% else %}
-                <a href="{{ url_for('logout') }}">Logout</a>
-                {% if current_user.is_admin %}
-                    <a href="{{ url_for('admin') }}">Admin Panel</a>
+
+        <nav class="navbar navbar-default">
+            <div class="container-fluid">
+              <div class="navbar-header">
+                <a class="navbar-brand" href="#">Agile Web Development Project</a>
+              </div>
+              <ul class="nav navbar-nav">
+                <li><a href="{{ url_for('index') }}">Home</a></li>
+                {% if current_user.is_anonymous %}
+                    <li><a href="{{ url_for('login') }}">Login</a></li>
                 {% endif %}
-            {% endif %}
-        </div>
+                {% if not current_user.is_anonymous %}
+                    <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                {% endif %}
+                {% if current_user.is_admin %}
+                    <li><a href="{{ url_for('admin') }}">Admin Panel</a></li>
+                {% endif %}
+              </ul>
+            </div>
+        </nav>
+
         <hr>
         {% with messages = get_flashed_messages() %}
-        {% if messages %}
-        <ul>
-            {% for message in messages %}
-            <li>{{ message }}</li>
-            {% endfor %}
-        </ul>
-        {% endif %}
+            {% if messages %}
+            <ul>
+                {% for message in messages %}
+                <li>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
         {% endwith %}
+
         {% block content %}{% endblock %}
     </body>
 </html>

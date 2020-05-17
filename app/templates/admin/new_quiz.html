@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<script src="/static/js/admin_newquiz.js"></script>
+<div class="jumbotron">
+    <h1>CREATE A NEW QUIZ</h1>
+</div>
+
+<div class="row">
+
+    <div class="col-sm-3">
+        {% include '/admin/admin_menu.html' %} 
+    </div>
+
+        <div class="col-sm-6">
+            <div class="form-group">
+                <form action="" method="post" novalidate>
+                    {{ form.hidden_tag() }}
+                    <p>{{ form.title.label }}</p>
+                    <p>{{ form.title(style='width: 100%') }}</p>
+                
+                    {% for error in form.title.errors %}
+                        <span style="color: red;">[{{ error }}]</span>
+                    {% endfor %}
+                    
+                    <div id='dynamicAdd'></div>
+                    <br>
+                    <button type="button" class="btn btn-primary" onclick="add_question()"><span class="glyphicon glyphicon-plus pull-right"></span>Add Question &nbsp;</button><br>
+                    <hr>
+                    <p>{{ form.submit(class="btn btn-primary btn-block", style="background-color: green") }}</p>
+                </form>
+            </div>
+        </div>
+    
+    <div class="col-sm-3">
+    </div>
+
+</div>
+
+
+
+{% endblock %}

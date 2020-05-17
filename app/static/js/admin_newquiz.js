@@ -36,6 +36,7 @@ function add_question()
     var newAdd = document.createElement('textarea');
     newAdd.setAttribute('name', 'questions-' + curLength + '-question');
     newAdd.setAttribute('id', 'q' + curLength);
+    newAdd.setAttribute('style', 'width: 85%')
     newDiv.appendChild(newAdd);
 
     // Create hidden element set to questionNum
@@ -60,7 +61,7 @@ function add_question()
     // onclick event handler to run add_multichoice function on Yes radio button click
     newAdd.setAttribute('onclick', 'add_multichoice(this)');
     newDiv.appendChild(newAdd);
-    newAdd = document.createElement('span');
+    newAdd = document.createElement('label');
     newAdd.innerHTML = "Yes";
     newDiv.appendChild(newAdd);
     // No....
@@ -68,10 +69,12 @@ function add_question()
     newAdd.setAttribute('type', 'radio');
     newAdd.setAttribute('name', radioName);
     newAdd.setAttribute('value', 'mc_no');
+    newAdd.setAttribute('style', 'margin-left: 10px')
+    newAdd.setAttribute('checked', 'checked')
     // onclick event handler to run del_multichoice function on No radio button click
     newAdd.setAttribute('onclick', 'del_multichoice(this)');
     newDiv.appendChild(newAdd);
-    newAdd = document.createElement('span');
+    newAdd = document.createElement('label');
     newAdd.innerHTML = "No";
     newDiv.appendChild(newAdd);
 
@@ -116,21 +119,26 @@ function add_multichoice(elem)
     for(var i=0; i < 4; i++)
     {
         newAdd = document.createElement('p');
+        newAdd.setAttribute('style', 'font-weight: bold')
         newAdd.innerHTML = 'Answer option #' + (i+1) + ':';
         ourDiv.appendChild(newAdd);
         newAdd = document.createElement('input');
         newAdd.setAttribute('type', 'text');
+        newAdd.setAttribute('style', 'width: 80%')
         newAdd.setAttribute('name', 'answers-' + question_num + '-answer' + (i+1));
         ourDiv.appendChild(newAdd);
         newAdd = document.createElement('input');
         newAdd.setAttribute('type', 'radio');
+        newAdd.setAttribute('style', 'margin-left: 10px')
         newAdd.setAttribute('name', radioName);
         newAdd.setAttribute('value', (i));
+        if(i == 0) {newAdd.setAttribute('checked', 'checked')}
         // onclick event handler for selecting this as the correct answer
         newAdd.setAttribute('onclick', 'add_correctanswer(this)');
         ourDiv.appendChild(newAdd);
-        newAdd = document.createElement('span');
-        newAdd.innerHTML = "This is the correct answer";
+        newAdd = document.createElement('label');
+        newAdd.setAttribute('style', 'margin-left: 10px')
+        newAdd.innerHTML = "Correct Answer";
         ourDiv.appendChild(newAdd);
         ourDiv.appendChild(document.createElement('br'));
     }

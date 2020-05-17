@@ -9,26 +9,43 @@
 {% set count_q = namespace(value=1) %}
 {% set count = namespace(value=0) %}
 
-<form action="" method="post" novalidate>
-    {% for q in questions %}
-        <h2>Question #{{ count_q.value }}:</h2>
-        <h4>{{ q.question }}</h3>
+<div class="row">
 
-        {% if q.is_multichoice %}
-            {% set count_mc = namespace(value=0) %}
-            {% for q in multichoice[count.value] %}
-                <p>{{ q.answer_selection }} <input type="radio" name="answer_for_q-{{ count.value }}-answer", value="{{ q.id }}"></p>
-                {% set count_mc.value = count_mc.value + 1 %}
+    <div class="col-sm-3">
+        {% include 'side_menu.html' %}
+    </div>
+
+    <div class="col-sm-6">
+        <form action="" method="post" novalidate>
+            {% for q in questions %}
+                <h3>Question #{{ count_q.value }}:</h3>
+                <h4>{{ q.question }}</h3>
+
+                {% if q.is_multichoice %}
+                    {% set count_mc = namespace(value=0) %}
+                    {% for q in multichoice[count.value] %}
+                        <p><input type="radio" name="answer_for_q-{{ count.value }}-answer", value="{{ q.id }}">
+                            <label style='margin-left: 10px;'>{{ q.answer_selection }}</label></p>
+                        {% set count_mc.value = count_mc.value + 1 %}
+                    {% endfor %}
+                {% else %}
+                    <textarea style="width: 85%;" name="answer_for_q-{{ count.value }}-answer"></textarea>
+                {% endif %}
+                <hr>
+                {% set count.value = count.value + 1 %}
+                {% set count_q.value = count_q.value + 1 %}
             {% endfor %}
-        {% else %}
-            <textarea name="answer_for_q-{{ count.value }}-answer"></textarea>
-        {% endif %}
-        <hr>
-        {% set count.value = count.value + 1 %}
-        {% set count_q.value = count_q.value + 1 %}
-    {% endfor %}
 
-    <p>{{ form.submit(class="btn btn-primary btn-block", style="background-color: green") }}</p>
-</form>
+            <button class="btn btn-primary btn-block" style="background-color: green;">
+            <span class="glyphicon glyphicon-share"></span> Submit Your Answers!</button>
+        </form>
+    </div>
+
+    <div class="col-sm-3">
+
+    </div>
+
+</div>
+
 
 {% endblock %}

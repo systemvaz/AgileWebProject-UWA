@@ -6,31 +6,49 @@
     <h1>Administrator Panel</h1>
 </div>
 
-<ul>
-    <li><a href="{{ url_for('admin_newquiz') }}">Create a new Quiz</a></li>
-</ul>
+<div class="row">
+
+    <div class="col-sm-3">
+        {% include '/admin/admin_menu.html' %}
+    </div>
+
+    <div class="col-sm-6">
+        <h3>Quizes needing review</h3>
+        <div class="table-responsive">
+            <table class="table">
+                <tr>
+                    <th>Question Set</th>
+                    <th>User</th>
+                    <th>Submitted</th>
+                    <th>Review Link</th>
+                </tr>
+                {% set count = namespace(value=0) %}
+                {% for q in review_quizes %}
+                    <tr>
+                        <td>{{ review_qset[count.value] }}</td>
+                        <td>{{ review_users[count.value] }}</td>
+                        <td>{{ q.timestamp.strftime("%A %d, %B %Y @ %H:%M") }}</td>
+                        <td>
+                            <a href="{{ url_for('reviewquiz') }}?attempt={{ q.id }}&user={{ review_users[count.value] }}" class="btn btn-info btn-sm" style="background: green;">
+                                <span class="glyphicon glyphicon-arrow-left"></span> Review
+                            </a>
+                        </td>
+                    </tr>
+                    {% set count.value = count.value + 1 %}
+                {% endfor %}
+            </table>
+        </div>
+    </div>
+
+    <div class="col-sm-3">
+        
+    </div> 
+    
+</div>
+
 
 <hr><br>
-<h3>Quizes needing review:</h3>
-<div class="table-responsive">
-    <table class="table">
-        <tr>
-            <th>Question Set</th>
-            <th>User</th>
-            <th>Timestamp</th>
-            <th>Review Link</th>
-        </tr>
-        {% set count = namespace(value=0) %}
-        {% for q in review_quizes %}
-            <tr>
-                <td>{{ review_qset[count.value] }}</td>
-                <td>{{ review_users[count.value] }}</td>
-                <td>{{ q.timestamp }}</td>
-                <td><a href="{{ url_for('admin_reviewquiz') }}?attempt={{ q.id }}&user={{ review_users[count.value] }}">Review</a></td>
-            </tr>
-        {% endfor %}
-    </table>
-</div>
+
 
 
 {% endblock %}

@@ -11,7 +11,8 @@ from app.forms import LoginForm, NewQuizForm, TakeQuizForm
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template('index.html', title='Home')
+    quizes = Qset.query.filter_by(is_active=True).all()
+    return render_template('index.html', title='Home', quizes=quizes)
 
 # Routes for login and logout
 @app.route('/login', methods=['GET', 'POST'])
@@ -49,7 +50,18 @@ def logout():
 @app.route('/view_quizes')
 def view_quizes():
     quizes = Qset.query.filter_by(is_active=True).all()
-    return render_template('view_quizes.html', title='Available Quizes', quizes=quizes)
+    # Get some stats on all the quizes
+    attempts = []
+    user_attempts = []
+    for q in quizes:
+        attempts_check = Attempts.query.filter_by(qset_id=q.id).all()
+        user_check = Attempts.query.filter_by(qset_id=q.id, user_id=current_user.id).all()
+        attempts.append(len(attempts_check))
+        user_attempts.append(len(user_check))
+        print(len(user_check))
+
+
+    return render_template('view_quizes.html', title='Available Quizes', quizes=quizes, attempts=attempts, user_attempts=user_attempts)
 
 
 # Route to take user to a quiz
@@ -102,9 +114,71 @@ def take_quiz():
 
             attempt.is_needs_review = review_flag
             db.session.add(attempt)
-            db.session.commit()     
+            db.session.commit()
+
+        attempt_id = attempt.id
+        user = User.query.filter_by(id=user_id).first()
+        user = user.username
+        return redirect(url_for('reviewquiz', attempt=attempt_id, user=user))     
     
     return render_template('render_quiz.html', title='Take this Quiz', quiz=qset, questions=questions, multichoice=multichoice, form=form)
+
+
+# Route to review quiz with marks. If admin allows for marking of quiz.
+@app.route('/review_quiz', methods=['GET', 'POST'])
+def reviewquiz():
+    # if current_user.is_anonymous or current_user.is_admin != True:
+    #     return redirect(url_for('index'))   
+
+    attempt_id = request.args.get('attempt')
+    user = request.args.get('user')
+
+    attemptquery = Attempts.query.filter_by(id=attempt_id).first()
+    timestamp = attemptquery.timestamp
+    timestamp = timestamp.strftime("%A %d, %B %Y @ %H:%M")
+    qset_id = attemptquery.qset_id
+
+    qset = Qset.query.filter_by(id=qset_id).first()
+    qset = qset.title
+    
+    questions = Question.query.filter_by(qset_id=qset_id).all()
+    answers = Results.query.filter_by(attempt_id=attempt_id).all()
+    mc_txt = []
+
+    for a in answers:
+        if not a.answer_mc is None:
+            mc = Multichoice.query.filter_by(id=a.answer_mc).first()
+            print(mc.answer_selection, flush=True)
+            mc_txt.append(mc.answer_selection)
+
+    # Run actions when question is marked correct or wrong by pressing the buttons
+    if request.method == 'POST':
+        markCorrect = request.form.get('markCorrect')
+        markWrong = request.form.get('markWrong')
+        
+        if markCorrect is not None:
+            mark = Results.query.filter_by(attempt_id=attempt_id, question_id=markCorrect).first()
+            mark.is_correct = True
+        elif markWrong is not None:
+            mark = Results.query.filter_by(attempt_id=attempt_id, question_id=markWrong).first()
+            mark.is_correct = False
+
+        mark.is_needs_review = False
+        db.session.add(mark)
+        db.session.commit()
+
+        # Check if there are any more questions to mark, if not change is_needs_review flag and return to admin page
+        mark_check = Results.query.filter_by(attempt_id=attempt_id, is_needs_review=True).all()
+        print("mark check: {}".format(mark_check))
+        if not mark_check:
+            mark_complete = Attempts.query.filter_by(id=attempt_id).first()
+            mark_complete.is_needs_review = False
+            db.session.add(mark_complete)
+            db.session.commit()
+
+            return redirect(url_for('admin'))
+
+    return render_template('review_quiz.html', title="Review this Quiz", user=user, timestamp=timestamp, qset=qset, questions=questions, answers=answers, mc_txt=mc_txt)
 
 
 # ------------------------
@@ -127,6 +201,9 @@ def admin():
         review_user.append(userquery.username)
         qsetquery = Qset.query.filter_by(id=r.qset_id).first()
         review_qset.append(qsetquery.title)
+
+    for u in review_user:
+        print(u, flush=True)
     
     return render_template('/admin/index.html', title='Administrator Panel', review_quizes=review_quizes, review_users=review_user, review_qset=review_qset)
 
@@ -194,59 +271,4 @@ def admin_newquiz():
 
         return redirect(url_for('admin'))
 
-    return render_template('/admin/newquiz.html', title='Create a new Quiz!', form=form)
-
-# Route for admins to review & mark quizes flagged for review
-@app.route('/admin/review_quiz', methods=['GET', 'POST'])
-def admin_reviewquiz():
-    if current_user.is_anonymous or current_user.is_admin != True:
-        return redirect(url_for('index'))   
-
-    attempt_id = request.args.get('attempt')
-    user = request.args.get('user')
-
-    attemptquery = Attempts.query.filter_by(id=attempt_id).first()
-    timestamp = attemptquery.timestamp
-    qset_id = attemptquery.qset_id
-
-    qset = Qset.query.filter_by(id=qset_id).first()
-    qset = qset.title
-    
-    questions = Question.query.filter_by(qset_id=qset_id).all()
-    answers = Results.query.filter_by(attempt_id=attempt_id).all()
-    mc_txt = []
-
-    for a in answers:
-        if not a.answer_mc is None:
-            mc = Multichoice.query.filter_by(id=a.answer_mc).first()
-            print(mc.answer_selection, flush=True)
-            mc_txt.append(mc.answer_selection)
-
-    # Run actions when question is marked correct or wrong by pressing the buttons
-    if request.method == 'POST':
-        markCorrect = request.form.get('markCorrect')
-        markWrong = request.form.get('markWrong')
-        
-        if markCorrect is not None:
-            mark = Results.query.filter_by(attempt_id=attempt_id, question_id=markCorrect).first()
-            mark.is_correct = True
-        elif markWrong is not None:
-            mark = Results.query.filter_by(attempt_id=attempt_id, question_id=markWrong).first()
-            mark.is_correct = False
-
-        mark.is_needs_review = False
-        db.session.add(mark)
-        db.session.commit()
-
-        # Check if there are any more questions to mark, if not change is_needs_review flag and return to admin page
-        mark_check = Results.query.filter_by(attempt_id=attempt_id, is_needs_review=True).all()
-        print("mark check: {}".format(mark_check))
-        if not mark_check:
-            mark_complete = Attempts.query.filter_by(id=attempt_id).first()
-            mark_complete.is_needs_review = False
-            db.session.add(mark_complete)
-            db.session.commit()
-
-            return redirect(url_for('admin'))
-
-    return render_template('/admin/reviewquiz.html', title="Review this Quiz", user=user, timestamp=timestamp, qset=qset, questions=questions, answers=answers, mc_txt=mc_txt)
+    return render_template('/admin/new_quiz.html', title='Create a new Quiz!', form=form)

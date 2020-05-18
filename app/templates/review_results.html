@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="jumbotron">
+    <h1>RESULTS: {{ qset }}</h1>
+</div>
+
+
+<div class="row">
+
+    <div class="col-sm-3">
+        {% include 'side_menu.html' %}
+    </div>
+
+    <div class="col-sm-6">
+        {% set count = namespace(value=0) %}
+        <div class="table-responsive">
+            <table class="table">
+                <tr>
+                    <th>Quiz</th>
+                    <th>Status</th>
+                    <th>Mark</th>
+                    <th>Attempted</th>
+                </tr>
+                {% for q in quiz %}
+                    <tr>
+                        <td><a href="{{ url_for('reviewquiz', attempt=attempts[count.value], user=current_user.username) }}">{{ q }}</a></td>
+                        {% if pending[count.value] == True %}
+                            <td style="color: orange">Pending Review</td>
+                        {% else %}
+                            <td style="color: green">Completed</td>
+                        {% endif %}
+                        <td>{{ mark[count.value] }} / {{ mark_outof[count.value] }}</td>
+                        <td>{{ timestamp[count.value] }}</td>
+                    </tr>
+                    {% set count.value = count.value + 1 %}
+                {% endfor %}
+    </div>
+
+    <div class="col-sm-3">
+
+    </div>
+
+</div>
+
+{% endblock %}

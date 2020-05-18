@@ -181,6 +181,52 @@ def reviewquiz():
     return render_template('review_quiz.html', title="Review this Quiz", user=user, timestamp=timestamp, qset=qset, questions=questions, answers=answers, mc_txt=mc_txt)
 
 
+# Route for a user to view all of their results
+@app.route('/review_results')
+def review_results():
+    user_id = current_user.id
+    quiz = []
+    mark = []
+    mark_outof = []
+    pending = []
+    attempt_ids = []
+    timestamp = []
+    i = 0
+
+    user_attempts = Attempts.query.filter_by(user_id=user_id).all()
+
+    for a in user_attempts:
+        q_count = 0
+        correct_count = 0
+        result = Results.query.filter_by(attempt_id=a.id).all()
+        quiz_title = Qset.query.filter_by(id=a.qset_id).first()
+        quiz.insert(i, quiz_title.title)
+        pending.insert(i, a.is_needs_review)
+        attempt_ids.insert(i, a.id)
+        time = a.timestamp
+        time = time.strftime("%A %d, %B %Y @ %H:%M")
+        timestamp.insert(i, time)
+        
+        for r in result:
+            is_correct = r.is_correct
+            if is_correct:
+                correct_count += 1
+            mark.insert(i, correct_count)
+            q_count += 1
+            mark_outof.insert(i, q_count)
+
+        i = i + 1
+
+    return render_template('review_results.html', title="View your Results", quiz=quiz, mark=mark, mark_outof=mark_outof, pending=pending, attempts=attempt_ids, timestamp=timestamp)
+
+
+# Route to view the leaderboard for all quizes
+@app.route('/view_ladder')
+def view_ladder():
+
+
+    return render_template('view_ladder.html', title='Leaderboards')
+
 # ------------------------
 # Administrator routes
 # ------------------------

@@ -40,13 +40,6 @@
 <div class="row">
 
     <div class="col-sm-3">
-        <div>
-            <h4><span style="font-weight: bold;">User: </span>{{ user }}</h4>
-            <h4><span style="font-weight: bold;">Mark: </span><span id="numCorrect"></span> / <span id="numQuestions"></span><span id="needsReview" style="color: orange;"></span></h4>
-            <h4><span style="font-weight: bold;">Quiz taken: </span>{{ timestamp }}</h4>
-            <hr>
-        </div>
-
         {% if current_user.is_admin %}
             {% include '/admin/admin_menu.html' %}
         {% else %}
@@ -55,6 +48,13 @@
     </div>
 
     <div class="col-sm-6">
+        <div>
+            <h4><span style="font-weight: bold;">User: </span>{{ user }}</h4>
+            <h4><span style="font-weight: bold;">Mark: </span><span id="numCorrect"></span> / <span id="numQuestions"></span><span id="needsReview" style="color: orange;"></span></h4>
+            <h4><span style="font-weight: bold;">Quiz taken: </span>{{ timestamp }}</h4>
+            <hr>
+        </div>
+        
         <form action="" method="post" novalidate>
             {% for q in questions %}
         

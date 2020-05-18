@@ -1,6 +1,38 @@
 {% extends "base.html" %}
 
 {% block content %}
-    <h1>Hi, {{ current_user.username }}</h1>
-    <h1>Hack the planet!</h1>
+
+    <div class="jumbotron">
+        <h1>Hack the planet!</h1>
+        <h1>Hi, {{ current_user.username }}</h1>
+    </div>
+
+    <div class="row">
+
+        <div class="col-sm-3">
+            {% include 'side_menu.html' %}  
+        </div>
+
+        <div class="col-sm-6">
+            <div class="jumbotron">
+                <h2 style="text-align: center;">Center stuff</h2>
+            </div>
+        </div>
+
+        <div class="col-sm-3">
+            <h2 style="text-align: center;">Take A Quiz!</h2>
+            <br><br>
+            {% for quiz in quizes %}
+                {% if quiz.is_active %}
+                    <a href="{{ url_for('take_quiz')}}?quiz={{ quiz.id }}" class="center-block btn btn-info btn-lg" 
+                        style="width: 75%; text-align: center; background-color: limegreen; white-space: normal;">
+                        <span class="glyphicon glyphicon-pencil pull-left"></span> &nbsp;{{ quiz.title }}
+                    </a>
+                    <br><br>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+    </div>
+
 {% endblock %}

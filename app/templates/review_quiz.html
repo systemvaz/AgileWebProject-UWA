@@ -1,0 +1,121 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<script>
+    function setDivColour(colour, ourdiv)
+    {
+        colourdiv = document.getElementById(ourdiv)
+        colourdiv.setAttribute("style", "background-color: " + colour + ";")
+    }
+
+    function updateMark(correct, numQ, review)
+    {
+        if(correct != null && numQ != null)
+        {
+            update = document.getElementById("numCorrect")
+            update.innerHTML = correct
+            update = document.getElementById("numQuestions")
+            update.innerHTML = numQ
+        }
+
+        if(review != null)
+        {
+            update = document.getElementById("needsReview")
+            update.innerHTML = "  Pending Review"
+        }
+
+    }
+</script>
+
+<div class="jumbotron">
+    <h1>REVIEW QUIZ: {{ qset }}</h1>
+</div>
+
+{% set count = namespace(value=0) %}
+{% set mc_count = namespace(value=0) %}
+{% set correct_count = namespace(value=0) %}
+
+
+<div class="row">
+
+    <div class="col-sm-3">
+        {% if current_user.is_admin %}
+            {% include '/admin/admin_menu.html' %}
+        {% else %}
+            {% include 'side_menu.html' %}
+        {% endif %}
+    </div>
+
+    <div class="col-sm-6">
+        <div>
+            <h4><span style="font-weight: bold;">User: </span>{{ user }}</h4>
+            <h4><span style="font-weight: bold;">Mark: </span><span id="numCorrect"></span> / <span id="numQuestions"></span><span id="needsReview" style="color: orange;"></span></h4>
+            <h4><span style="font-weight: bold;">Quiz taken: </span>{{ timestamp }}</h4>
+            <hr>
+        </div>
+        
+        <form action="" method="post" novalidate>
+            {% for q in questions %}
+        
+                <div id="view-question-{{ count.value }}">
+                    <h2>Question #{{ count.value + 1 }}:</h2>
+                </div>
+                <h4>{{ q.question }}</h4>
+        
+                {% if q.is_multichoice %}
+                    <p>{{ mc_txt[mc_count.value] }}</p>
+                    {% set mc_count.value = mc_count.value + 1 %}
+                    {% if answers[count.value].is_correct %}
+                        <div style="background-color: green;">
+                            <p style="color: white;">Correct Multiple Choice Answer</p>
+                            {% set correct_count.value = correct_count.value + 1 %}
+                        </div>
+                    {% else %}
+                        <div style="background-color: red;">
+                            <p style="color: white;">Incorrect Multiple Choice Answer</p>
+                        </div>
+                    {% endif %}
+                
+                {% else %}   
+                    <p>{{ answers[count.value].answer_txt }}</p>
+                    {% if answers[count.value].is_correct %}
+                        <div style="background-color: green;">
+                            <p style="color: white;">Marked Correct</p>
+                            {% set correct_count.value = correct_count.value + 1 %}
+                        </div>
+                    {% elif answers[count.value].is_correct == False %}
+                        <div style="background-color: red;">
+                            <p style="color: white;">Marked Incorrect</p>
+                        </div>
+                    {% endif %}
+        
+                    {% if answers[count.value].is_needs_review %}
+                        <script>setDivColour("orange", "view-question-{{ count.value }}")</script>
+                        {% if current_user.is_admin %} 
+                            <p>
+                                <button class="btn btn-info btn-md" style="background-color: green;" value="{{ q.id }}" name="markCorrect">
+                                    <span class="glyphicon glyphicon-ok"></span> Mark Correct
+                                </button> 
+                                <button class="btn btn-info btn-md" style="background-color: red; margin-left: 20px;" value="{{ q.id }}" name="markWrong">
+                                    <span class="glyphicon glyphicon-remove"></span> Mark Wrong
+                                </button>
+                            </p>
+                        {% endif %}
+                        <script>updateMark(null, null, "pending")</script>
+                    {% endif %}
+        
+                {% endif %}
+                <hr>
+                {% set count.value = count.value + 1 %}
+        
+                <script>updateMark({{ correct_count.value }}, {{ count.value }}, null )</script>
+            {% endfor %}
+        </form>
+    </div>
+
+    <div class="col-sm-3">
+    </div>
+
+
+{% endblock %}

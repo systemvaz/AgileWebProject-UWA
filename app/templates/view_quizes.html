@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="jumbotron">
+    <h1>AVAILABLE QUIZES</h1>
+</div>
+
+<div class="row">
+
+    <div class="col-sm-3">
+        {% include 'side_menu.html' %}
+    </div>
+
+    <div class="col-sm-6">
+        {% set count = namespace(value=0) %}
+        {% for quiz in quizes %}
+            {% if quiz.is_active %}
+                <h3>{{ quiz.title }}</h3>
+                <h4>Quiz has been taken {{ attempts[count.value] }} times by all members</h4>
+                <a href="{{ url_for('take_quiz')}}?quiz={{ quiz.id }}" class="btn btn-info btn-lg" style="background-color: green; width: 50%;">
+                    <span class="glyphicon glyphicon-pencil"></span> Take this Quiz!
+                </a>
+                {% if user_attempts[count.value] > 0 %}
+                    <span style="color: green;">You've attempted this quiz {{ user_attempts[count.value] }} times</span>
+                {% else %}
+                    <span style="color: red;">You haven't attempted this quiz yet</span>
+                {% endif %}
+                <br>
+                <br>
+            {% endif %}
+            {% set count.value = count.value + 1 %}
+        {% endfor %}
+    </div>
+
+    <div class="col-sm-3">
+    </div>
+
+</div>
+
+
+{% endblock %}

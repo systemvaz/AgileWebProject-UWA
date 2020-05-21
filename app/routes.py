@@ -180,12 +180,10 @@ def reviewquiz():
 
     return render_template('review_quiz.html', title="Review this Quiz", user=user, timestamp=timestamp, qset=qset, questions=questions, answers=answers, mc_txt=mc_txt)
 
-
-# Route for a user to view all of their results
-@app.route('/review_results')
-def review_results():
-    user_id = current_user.id
+# Helper funtion to return quiz attempts, marks and stats given a user id
+def helper_get_results(user_id):
     quiz = []
+    qset_ids = []
     mark = []
     mark_outof = []
     pending = []
@@ -198,6 +196,7 @@ def review_results():
     for a in user_attempts:
         q_count = 0
         correct_count = 0
+        qset_ids.insert(i, a.qset_id)
         result = Results.query.filter_by(attempt_id=a.id).all()
         quiz_title = Qset.query.filter_by(id=a.qset_id).first()
         quiz.insert(i, quiz_title.title)
@@ -217,15 +216,80 @@ def review_results():
 
         i = i + 1
 
+    return qset_ids, quiz, mark, mark_outof, pending, attempt_ids, timestamp
+
+
+
+# Route for a user to view all of their results, calls above helper function
+@app.route('/review_results')
+def review_results():
+    user_id = current_user.id
+    _, quiz, mark, mark_outof, pending, attempt_ids, timestamp = helper_get_results(user_id)
+
     return render_template('review_results.html', title="View your Results", quiz=quiz, mark=mark, mark_outof=mark_outof, pending=pending, attempts=attempt_ids, timestamp=timestamp)
 
 
-# Route to view the leaderboard for all quizes
+# Helper function to return the best result a user obtained for each quiz they attempted
+def helper_get_topmark(qset_ids, mark, mark_outof, pending):
+    i = 0
+    exists = False
+    top_mark_dict = []
+
+    for qset in qset_ids:
+        if not pending[i]:
+            get_mark = mark[i]
+            get_outof = mark_outof[i]
+            for check in top_mark_dict:
+                if check.get("qset_id") == qset:
+                    # Check if this entry if the top mark seen so far
+                    exists = True
+                    if check.get("top_mark") < get_mark:
+                        check["top_mark"] = get_mark
+            if not exists:
+                top_mark_dict.append({"qset_id": qset, "top_mark": get_mark, "out_of": get_outof})    
+        exists = False    
+        i = i + 1        
+
+    return top_mark_dict
+
+
+# Route to view the leaderboard for all quizes, calls above helper function
 @app.route('/view_ladder')
 def view_ladder():
+    exists = False
+    # Leaderboard dictionary
+    leaderboard_dict_lst = []
 
+    all_users = User.query.all()
+    # Get results and their top marks for each user
+    for user in all_users:
+        username = user.username
+        qset_id, quiz, mark, mark_outof, pending, attempt_ids, timestamp = helper_get_results(user.id)
+        user_mark_dict = helper_get_topmark(qset_id, mark, mark_outof, pending)
+        
+        # Do comparison with our Leaderboard dictionary.
+        for user_mark in user_mark_dict:
+            for check in leaderboard_dict_lst:
+                # If quiz id in leaderboard dict, check if users top mark is the global top mark seen so far
+                if check.get("qset_id") == user_mark.get("qset_id"):
+                    exists = True
+                    if check.get("top_mark") < user_mark.get("top_mark"):
+                        # Add it to our Leaderboard dict
+                        check["user"] = username
+                        check["mark"] = user_mark.get("top_mark")
+                        check["out_of"] = user_mark.get("mark_outof")
+                    
+            # If no entry for this quiz in leaderboard dict so far OR the user got equal top marks with another user.
+            # Add to our leaderboard dict
+            if not exists or check.get("top_mark") == user_mark.get("top_mark"):
+                leaderboard_dict_lst.append({"user": username, "qset_id": user_mark.get("qset_id"), "top_mark": user_mark.get("top_mark"), "out_of": user_mark.get("out_of")})
+            exists = False
 
-    return render_template('view_ladder.html', title='Leaderboards')
+    qsets = Qset.query.all()
+
+    return render_template('view_ladder.html', title='Leaderboards', leaderboard=leaderboard_dict_lst, qsets=qsets)
+
+    
 
 # ------------------------
 # Administrator routes

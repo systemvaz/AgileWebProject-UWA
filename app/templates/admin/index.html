@@ -39,12 +39,6 @@
             </table>
             <hr><br>
         </div>
-
-        <h3>Site Statistics</h3>
-        <div class="table-responsive">
-            <table class="table">
-            </table>
-        </div>
     </div>
 
     <div class="col-sm-3">
@@ -56,6 +50,13 @@
                     <th>Name</th>
                     <th>Last Logged In</th>
                 </tr>
+                {% for user in users %}
+                    <tr>
+                        <td><a href="{{ url_for('review_results', user=user.id) }}">{{ user.username }}</a></td>
+                        <td>{{ user.first_name }} {{ user.last_name }}</td>
+                        <td>{{ user.last_seen.strftime("%A %d, %B %Y @ %H:%M") }}</td>
+                    </tr>
+                {% endfor %}
             </table>
         </div>
     </div> 

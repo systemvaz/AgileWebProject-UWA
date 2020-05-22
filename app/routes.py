@@ -223,7 +223,11 @@ def helper_get_results(user_id):
 # Route for a user to view all of their results, calls above helper function
 @app.route('/review_results')
 def review_results():
-    user_id = current_user.id
+    user_id = 0
+    if request.args.get('user') is None:
+        user_id = current_user.id
+    else:
+        user_id = request.args.get('user')
     _, quiz, mark, mark_outof, pending, attempt_ids, timestamp = helper_get_results(user_id)
 
     return render_template('review_results.html', title="View your Results", quiz=quiz, mark=mark, mark_outof=mark_outof, pending=pending, attempts=attempt_ids, timestamp=timestamp)
@@ -312,10 +316,9 @@ def admin():
         qsetquery = Qset.query.filter_by(id=r.qset_id).first()
         review_qset.append(qsetquery.title)
 
-    for u in review_user:
-        print(u, flush=True)
+    users = User.query.all()
     
-    return render_template('/admin/index.html', title='Administrator Panel', review_quizes=review_quizes, review_users=review_user, review_qset=review_qset)
+    return render_template('/admin/index.html', title='Administrator Panel', review_quizes=review_quizes, review_users=review_user, review_qset=review_qset, users=users)
 
 
 # Route to create new QnA set: admin/new_quiz

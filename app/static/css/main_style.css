@@ -1,0 +1,110 @@
+body 
+{
+    background-color: black;
+}
+
+h1
+{
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-weight: bolder;
+}
+
+h3
+{
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-weight: bolder;
+    color: darkred;
+
+}
+
+td
+{
+    color: snow;
+}
+
+th
+{
+    color: darkorange;
+}
+
+/* Customise baseline bootstrap menu */
+.nav a:hover
+{
+    animation: animate_menus 3s infinite;
+    color: red !important;
+}
+
+/* Site logo in top left corner */
+#logo_small:hover
+{
+    animation: animate_logo 5s infinite;
+}
+
+/* Pulsing red shadow animation for logo with nice trasparent blur*/
+@keyframes animate_logo
+{
+    50%
+    {
+        box-shadow: 10px 20px 60px red;
+    }
+}
+
+/* Evolving text-shadow drop animation on menus */
+@keyframes animate_menus
+{
+    50%
+    {
+        text-shadow: 0 10px snow,
+                     0 0 20px snow, 
+                     0 0 30px snow, 
+                     0 0 40px red,
+                     0 0 70px red, 
+                     0 0 80px red, 
+                     0 0 100px red, 
+                     0 0 150px red;
+    }
+}
+
+/* Site banner */
+#myBanner
+{
+    background-image: url('/static/img/banner.jpg');
+    background-size: cover;
+    height: 200px;
+    background-position: center;
+    background-repeat: no-repeat;
+}
+
+/* Title on each page, glowing effect */
+#myTitle
+{
+    text-align: center;
+    /* text-shadow: 0 0 10px snow,
+                    0 0 20px snow, 
+                    0 0 30px snow, 
+                    0 0 40px red,
+                    0 0 70px red, 
+                    0 0 80px red, 
+                    0 0 100px red, 
+                    0 0 150px red; */
+}
+
+#sideMenu
+{
+    width: 75%; 
+    text-align: center;
+    background-color: darkred;
+}
+
+.myCentreJumbotron
+{
+    background-color: black;
+    color: snow;
+}
+
+/* Customise bootstrap jumbotron */
+.jumbotron
+{
+    background-color: black;
+    color: snow;
+}

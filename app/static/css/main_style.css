@@ -1,0 +1,253 @@
+body 
+{
+    background-color: snow;
+}
+
+h1
+{
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-weight: bolder;
+    color: black;
+}
+
+h2
+{
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-weight: bolder;
+    color: #a93d00
+}
+
+h3
+{
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    font-weight: bolder;
+    color: rebeccapurple;
+
+}
+
+h4
+{
+    font-family: Georgia, 'Times New Roman', Times, serif;
+    color: black;
+}
+
+td
+{
+    color: black;
+    border: 0px;
+}
+
+th
+{
+    color: #a93d00;
+}
+
+table, th
+{
+    padding: 15px;
+    /* border: 1px solid purple; */
+    border: none;
+    border-top: 5px solid #a93d00;
+}
+
+tr:hover 
+{
+    background-color: lightcyan;
+}
+
+/* Customise baseline bootstrap menu */
+.nav a
+{
+    color: #a93d00 !important;
+    font-weight: bolder;
+}
+
+.nav a:hover
+{
+    animation: animate_menus 3s infinite;
+    color: red !important;
+}
+
+/* Site logo in top left corner */
+#logo_small:hover
+{
+    animation: animate_logo 5s infinite;
+}
+
+/* Pulsing red shadow animation for logo with nice trasparent blur*/
+@keyframes animate_logo
+{
+    50%
+    {
+        box-shadow: 10px 20px 60px red;
+    }
+}
+
+/* Evolving text-shadow drop animation on menus */
+@keyframes animate_menus
+{
+    50%
+    {
+        text-shadow: 0 10px snow,
+                     0 0 20px snow, 
+                     0 0 30px snow, 
+                     0 0 40px red,
+                     0 0 70px red, 
+                     0 0 80px red, 
+                     0 0 100px red, 
+                     0 0 150px red;
+    }
+}
+
+/* Site banner */
+#myBanner
+{
+    background-image: url('/static/img/banner2.jpg');
+    background-size: cover;
+    height: 200px;
+    background-position: center;
+    background-repeat: no-repeat;
+    animation: animate_banner 10s infinite;
+}
+
+/* Make banner glow slowly, colours picked from banner image */
+@keyframes animate_banner
+{
+    50%
+    {
+        box-shadow: 0 0 10px #a93d00,
+        0 0 20px #a93d00, 
+        0 0 30px #a93d00, 
+        0 0 40px #a93d00,
+        0 0 70px #a93d00;
+    }
+
+}
+
+/* More flames.... */
+#moreFlames
+{
+    width: 100%;
+    height: 1px;
+    background-color: black;
+    animation: animate_banner 10s infinite;
+}
+
+/* Title on each page, glowing effect, in time with banner animation (10s) */
+#myTitle
+{
+    text-align: left;
+    background-image: linear-gradient(to bottom right, black, #222);
+    background-color: #222;
+    text-indent: 40px;
+}
+
+#myTitle h2
+{
+    /* animation: animate_title 10s infinite; */
+}
+
+@keyframes animate_title
+{
+    50%
+    {
+        text-shadow: 0 0 40px red,
+                    0 0 70px red, 
+                    0 0 80px red, 
+                    0 0 100px red, 
+                    0 0 150px red;
+    }
+}
+
+/* Side menu styling */
+#sideMenu
+{
+    width: 250px;
+    position: fixed;
+    height: 100vh;
+    z-index: 1;
+    /* background-image: linear-gradient(to bottom, black, snow); */
+    color: darkred;
+    transition: all 0.3s;
+    text-align: center;
+    border-radius: 10px;
+}
+
+#sideMenu a:link 
+{
+    text-decoration: none ;
+} 
+
+.wrapper
+{
+    display: flex;
+    width: 100%;
+}
+
+#sideMenu ul.components
+{
+    padding: 20px 0;
+    border-top: 5px dotted red;
+}
+
+#sideMenu ul li a 
+{
+    color: darkslateblue;
+    padding: 10px;
+    font-size: 1.2em;
+    display: block;
+}
+
+#sideMenu ul li a:hover 
+{
+    /* color: cornsilk; */
+    /* background-image: linear-gradient(to right, black, darkgreen, black); */
+    font-weight: bold;
+    animation: animate_glyphicons 3s infinite;
+}
+
+@keyframes animate_glyphicons
+{
+    50% 
+    {
+        transform: scaleX(1.09)
+    }
+}
+
+/* Right hand quiz side bar on index page */
+#quizBar
+{
+    position: fixed;
+    height: 100vh;
+    /* background-image: linear-gradient(to bottom left, black, #222); */
+}
+
+#quizBar a:hover
+{
+    animation: animate_glyphicons 3s infinite;
+    /* animation: animate_title 3s infinite; */
+}
+
+#takeQuiz:hover
+{
+    animation: animate_glyphicons 3s infinite;
+}
+
+/* Customise bootstrap jumbotron */
+.myCentreJumbotron
+{
+    background-color: black;
+    color: snow;
+}
+
+.jumbotron
+{
+    background-color: black;
+}
+
+/* Customise columns */
+.col-sm-6
+{
+    /* background-color: #222; */
+    border-radius: 10px;
+}

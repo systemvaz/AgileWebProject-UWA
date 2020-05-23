@@ -2,9 +2,11 @@
 
 {% block content %}
 
-<div class="jumbotron">
-    <h1>RESULTS: {{ qset }}</h1>
+<div class="jumbotron" id='myTitle'>
+    <h2>Leaderboards {{ qset }}</h2>
 </div>
+
+<div id='moreFlames'></div>
 
 <div class="row">
 
@@ -25,8 +27,8 @@
 
                 {% if result.get("qset_id") == qset.id %}
                     <tr>
-                        <td>{{ result.get("user") }}</td>
-                        <td>{{ result.get("top_mark") }}/{{ result.get("out_of") }}</td>
+                        <td style='font-size: large'>{{ result.get("user") }}</td>
+                        <td style='font-size: large'>{{ result.get("top_mark") }}/{{ result.get("out_of") }}</td>
                     </tr>
 
                 {% endif %}

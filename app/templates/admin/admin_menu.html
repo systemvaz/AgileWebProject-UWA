@@ -1,21 +1,33 @@
 {% block content %}
 
-<a href="#" class="center-block btn btn-info btn-lg" style="width: 75%; text-align: center">
-    <span class="glyphicon glyphicon-user pull-right"></span> User Management 
-</a>
-<br>
-<br>
+<div class='wrapper'>
 
-<a href="#" class="center-block btn btn-info btn-lg" style="width: 75%; text-align: center">
-    <span class="glyphicon glyphicon-tower pull-right"></span> Quiz Management 
-</a>
-<br>
-<br>
+    <nav id='sideMenu'>
+        <div class='sidebar-header'>
+            <h3>Admin Menu</h2>
+        </div>
 
-<a href="{{ url_for('admin_newquiz') }}" class="center-block btn btn-info btn-lg" style="width: 75%; text-align: center">
-    <span class="glyphicon glyphicon-pencil pull-right"></span> Create a New Quiz 
-</a>
-<br>
-<br>
+        <ul class='list-unstyled components'>
+            <li class='active'>
+                <a href="#">
+                    <span class="glyphicon glyphicon-user pull-right" style='color: blue'></span> User Management 
+                </a>
+            </li>
+            {% if not current_user.is_anonymous %}
+                <li>
+                    <a href="#">
+                        <span class="glyphicon glyphicon-tower pull-right" style='color: orange'></span> Quiz Management 
+                    </a>
+                </li>
+            {% endif %}
+            <li>
+                <a href="{{ url_for('admin_newquiz') }}">
+                    <span class="glyphicon glyphicon-pencil pull-right" style='color: purple'></span> Create a New Quiz 
+                </a>
+            </li>
+        </ul>
+    </nav>
+
+</div>
 
 {% endblock %}

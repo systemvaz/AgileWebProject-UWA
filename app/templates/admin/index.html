@@ -3,8 +3,10 @@
 {% block content %}
 
 <div class="jumbotron" id='myTitle'>
-    <h1>ADMIN PANEL</h1>
+    <h2>Administration Panel</h2>
 </div>
+
+<div id='moreFlames'></div>
 
 <div class="row">
 
@@ -28,7 +30,7 @@
                         <td>{{ review_qset[count.value] }}</td>
                         <td>{{ review_users[count.value] }}</td>
                         <td>{{ q.timestamp.strftime("%A %d, %B %Y @ %H:%M") }}</td>
-                        <td>
+                        <td id='quizBar'>
                             <a href="{{ url_for('reviewquiz') }}?attempt={{ q.id }}&user={{ review_users[count.value] }}" class="btn btn-info btn-sm" style="background: green;">
                                 <span class="glyphicon glyphicon-arrow-left"></span> Review
                             </a>

@@ -6,7 +6,7 @@ from datetime import datetime
 from app import app
 from app import db
 from app.models import User, Qset, Question, Multichoice, Results, Attempts
-from app.forms import LoginForm, NewQuizForm, TakeQuizForm
+from app.forms import LoginForm, NewQuizForm, TakeQuizForm, RegistrationForm
 
 @app.route('/')
 @app.route('/index')
@@ -24,7 +24,7 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
-            flash('Invalid username or password')
+            # flash('Invalid username or password')
             return redirect(url_for('login'))
 
         login_user(user, remember=form.remember_me.data)
@@ -35,6 +35,21 @@ def login():
         return redirect(next_page)
 
     return render_template('login.html', title='Sign in', form=form)
+
+
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        user = User(username=form.username.data, first_name= form.firstname.data, last_name = form.lastname.data, email=form.email.data,is_admin = 0 )
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        flash('Congratulations, you are now a registered user!')
+        return redirect(url_for('login'))
+    return render_template('signup.html', title='Signup', form=form)
 
 @app.route('/logout')
 def logout():

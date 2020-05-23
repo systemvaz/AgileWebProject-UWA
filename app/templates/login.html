@@ -20,5 +20,9 @@
     </p>
     <p>{{ form.remember_me() }} {{ form.remember_me.label }}</p>
     <p>{{ form.submit() }}</p>
+
+    {% if request.args.get('access') == "0" %}
+    <p>access denied</p>
+    {% endif %}
 </form>
 {% endblock %}

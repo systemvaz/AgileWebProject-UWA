@@ -18,26 +18,32 @@
 
     <body>
 
-        <nav class="navbar navbar-inverse">
+        <nav class="navbar navbar-inverse" style="font-size: large;">
             <div class="container-fluid">
               <div class="navbar-header">
                 <a class="navbar-brand" href="{{ url_for('index') }}"><img id="logo_small" src="static/img/logo_small.png"></a>
               </div>
               <ul class="nav navbar-nav our_nav">
                 {% if current_user.is_admin %}
-                    <li><a href="{{ url_for('admin') }}">Admin Panel</a></li>
+                    <li><a href="{{ url_for('admin') }}"><span class='glyphicon glyphicon-queen'></span>&nbsp; Admin Panel</a></li>
                 {% endif %}
               </ul>
 
               {% if not current_user.is_anonymous %}
+
               <ul class='nav navbar-nav navbar-right'>
-                  <li><a href="{{ url_for('logout') }}">Logout</a></li>
+                <li><a href="{{ url_for('account') }}"><span class='glyphicon glyphicon-user'></span>&nbsp; {{ current_user.username }}</a></li>
               </ul>
+
+              <ul class='nav navbar-nav navbar-right'>
+                  <li><a href="{{ url_for('logout') }}"><span class='glyphicon glyphicon-log-in'></span>&nbsp; Logout</a></li>
+              </ul>
+
               {% endif %}
 
               {% if current_user.is_anonymous %}
               <ul class='nav navbar-nav navbar-right'>
-                <li><a href="{{ url_for('login') }}">Login</a></li>
+                <li><a href="{{ url_for('login') }}"><span class='glyphicon glyphicon-log-in'></span>&nbsp; Login</a></li>
               </ul>
               {% endif %}
             </div>

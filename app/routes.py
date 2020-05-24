@@ -93,11 +93,10 @@ def view_quizes():
     user_attempts = []
     for q in quizes:
         attempts_check = Attempts.query.filter_by(qset_id=q.id).all()
-        user_check = Attempts.query.filter_by(qset_id=q.id, user_id=current_user.id).all()
         attempts.append(len(attempts_check))
-        user_attempts.append(len(user_check))
-        print(len(user_check))
-
+        if not current_user.is_anonymous:
+            user_check = Attempts.query.filter_by(qset_id=q.id, user_id=current_user.id).all()
+            user_attempts.append(len(user_check))
 
     return render_template('view_quizes.html', title='Available Quizes', quizes=quizes, attempts=attempts, user_attempts=user_attempts)
 

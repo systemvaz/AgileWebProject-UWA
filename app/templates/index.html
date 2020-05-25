@@ -3,7 +3,7 @@
 {% block content %}
 
     <div class="jumbotron" id='myTitle'>
-        <h2>Welcome, {{ current_user.username }}</h2>
+        <h2>Welcome {{ current_user.username }}</h2>
     </div>
 
     <div id='moreFlames'></div>
@@ -14,8 +14,14 @@
             {% include 'side_menu.html' %}  
         </div>
 
-        <div class="col-sm-6">
-
+        <div class="col-sm-6" id='homepageText'>
+            <h2 style="color: darkred; text-align: center; font-style: italic;">Competitive Quiz Taking Meets Gaming</h2>
+            <h4 style='color: snow'>Welcome to the Mortal Kombat of competitive quiz taking. Here you will find many quizes for you to take,
+                testing your knowledge of video games and video gaming history. 
+            </h4>
+            <h4 style='color: snow'>Compete to get your name on the Leaderboard and claim your position as a master of knowledge who defeats all that dare to compete against!
+            </h4>
+            <h3 style='color: darkorange; text-align: center;'>Good Luck!</h3>
         </div>
 
         <div class="col-sm-3">

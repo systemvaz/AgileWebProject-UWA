@@ -383,7 +383,12 @@ def admin_newquiz():
                 question_id = question.id
 
                 ans = form.answers[i]
-                correct = int(ans.correct.data)
+                print("{}".format(ans))
+                correct = 0
+                try:
+                    correct = int(ans.correct.data)
+                except:
+                    correct = 0
                 set_correct = False
                 # Adding multichoice answer 1 to Multichoice table
                 print('Adding answer 1: {}'.format(ans.answer1.data))
@@ -420,3 +425,26 @@ def admin_newquiz():
         return redirect(url_for('admin'))
 
     return render_template('/admin/new_quiz.html', title='Create a new Quiz!', form=form)
+
+
+@app.route('/admin/admin_quizmanagement', methods=['GET', 'POST'])
+def admin_quizmanagement():
+    
+    if request.args.get('activate') == 'False':
+        activate = False
+        id = int(request.args.get('qset_id'))
+        qset = Qset.query.get(id)
+        qset.is_active = activate
+        db.session.add(qset)
+        db.session.commit()
+    elif request.args.get('activate') == 'True':
+        activate = True
+        id = int(request.args.get('qset_id'))
+        qset = Qset.query.get(id)
+        qset.is_active = activate
+        db.session.add(qset)
+        db.session.commit()
+
+    qsets = Qset.query.all()
+
+    return render_template('/admin/admin_quizmanagement.html', title='Quiz Management', qsets=qsets)

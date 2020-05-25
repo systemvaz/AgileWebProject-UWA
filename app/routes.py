@@ -9,7 +9,7 @@ from PIL import Image
 from app import app
 from app import db
 from app.models import User, Qset, Question, Multichoice, Results, Attempts
-from app.forms import LoginForm, NewQuizForm, TakeQuizForm, UpdateAccountForm
+from app.forms import LoginForm, NewQuizForm, TakeQuizForm, RegistrationForm, UpdateAccountForm
 
 @app.route('/')
 @app.route('/index')
@@ -39,6 +39,21 @@ def login():
 
     return render_template('login.html', title='Sign in', form=form)
 
+    
+@app.route('/signup', methods=['GET', 'POST'])
+def signup():
+    if current_user.is_authenticated:
+        return redirect(url_for('index'))
+    form = RegistrationForm()
+    if form.validate_on_submit():
+        user = User(username=form.username.data, first_name= form.firstname.data, 
+        last_name = form.lastname.data, email=form.email.data,is_admin = 0, is_active=1 )
+        user.set_password(form.password.data)
+        db.session.add(user)
+        db.session.commit()
+        return redirect(url_for('login'))
+    return render_template('signup.html', title='Signup', form=form)
+
 @app.route('/logout')
 def logout():
     logout_user()
@@ -49,20 +64,28 @@ def logout():
 @login_required
 def account():
     form = UpdateAccountForm()
+    if current_user.is_admin and not request.args.get("user") == None:
+        userid = request.args.get("user")
+        user = User.query.get(int( userid))
+    else :
+        user = current_user
     if form.validate_on_submit():
         if form.picture.data:
             picture_file = save_picture(form.picture.data)
-            current_user.image_file = picture_file
-        current_user.username = form.username.data
-        current_user.email = form.email.data
+            user.image_file = picture_file
+        user.username = form.username.data
+        user.email = form.email.data
         db.session.commit()
         return redirect(url_for('account'))
     elif request.method == 'GET':
-        form.username.data = current_user.username
-        form.email.data = current_user.email
-    image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
+        form.username.data = user.username
+        form.email.data = user.email
+    if not user.image_file is None:
+        image_file = url_for('static', filename='profile_pics/' + user.image_file)
+    else:
+        image_file = None
     return render_template('account.html', title='Account',
-                           image_file=image_file, form=form)
+                           image_file=image_file, form=form, user = user)
 
 
 def save_picture(form_picture):
@@ -427,6 +450,22 @@ def admin_newquiz():
         return redirect(url_for('admin'))
 
     return render_template('/admin/new_quiz.html', title='Create a new Quiz!', form=form)
+
+@app.route('/admin_users', methods=['GET', 'POST'])
+def admin_users():
+    user_id = request.args.get("user")
+    users = User.query.all()
+    active = request.args.get("active")
+    if active is not None:
+        if active == "False":
+            change_user = User.query.get(int(user_id))
+            change_user.is_active = False
+        if active == "True":
+            change_user = User.query.get(int(user_id))
+            change_user.is_active = True
+        db.session.add(change_user)
+        db.session.commit()
+    return render_template("/admin/admin_users.html", title = "User Management",users=users)
 
 
 @app.route('/admin/admin_quizmanagement', methods=['GET', 'POST'])

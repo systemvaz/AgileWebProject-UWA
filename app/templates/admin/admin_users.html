@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<div class="jumbotron" id='myTitle'>
+    <h2>User Management</h2>
+</div>
+
+<div id='moreFlames'></div>
+
+<div class="row">
+
+    <div class="col-sm-3">
+        {% include '/admin/admin_menu.html' %}
+    </div>
+
+    <div class="col-sm-6">
+        <table class="table">
+            <tr>
+                <th>Username</th>
+                <th>Name</th>
+                <th>Last Logged In</th>
+                <th>Account</th>
+            </tr>
+            {% for user in users %}
+            <tr>
+                <td><a href="{{ url_for('account', user=user.id) }}">{{ user.username }}</a></td>
+                <td>{{ user.first_name }} {{ user.last_name }}</td>
+                <td>{{ user.last_seen.strftime("%A %d, %B %Y @ %H:%M") }}</td>
+                {% if not user.id == current_user.id%}
+                {% if user.is_active %}
+                <td id="quizBar">
+                    <a href="{{ url_for('admin_users', user= user.id, active = False) }}" class="btn btn-info btn-sm"
+                        style="background: red;">
+                        <span class="glyphicon glyphicon-arrow-left"></span> Deactivate
+                    </a>
+                </td>
+                {% else %}
+                <td id="quizBar">
+                    <a href="{{ url_for('admin_users', user= user.id, active = True) }}" class="btn btn-info btn-sm"
+                        style="background: green;">
+                        <span class="glyphicon glyphicon-arrow-left"></span> Activate
+                    </a>
+                </td>
+                {% endif%}
+                {% endif%}
+            </tr>
+            {% endfor %}
+        </table>
+
+    </div>
+
+    <div class="col-sm-3">
+
+
+    </div>
+
+
+
+    {% endblock %}

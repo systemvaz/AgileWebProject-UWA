@@ -28,12 +28,12 @@
                         <td>{{ q.title }}</td>
                         <td>{{ q.is_active }}</td>
                         {% if q.is_active %}
-                        <td>
+                        <td id='quizBar'>
                             <a href="{{ url_for('admin_quizmanagement', qset_id=q.id, activate=False) }}" class="btn btn-info btn-sm" style="background: red;">
                             <span class="glyphicon glyphicon-arrow-left"></span> Deactivate Quiz</a>
                         </td>
                         {% else %}
-                        <td>
+                        <td id='quizBar'>
                             <a href="{{ url_for('admin_quizmanagement', qset_id=q.id, activate=True) }}" class="btn btn-info btn-sm" style="background: green;">
                             <span class="glyphicon glyphicon-arrow-left"></span> Activate Quiz</a>
                         </td>

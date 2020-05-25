@@ -16,27 +16,29 @@
 
     <div class="col-sm-6">
         {% for qset in qsets %}
-        <h3><a href="{{ url_for('take_quiz', quiz=qset.id) }}">{{ qset.title }}</a></h3>
-        <table class="table">
-            <tr>
-                <th>Username</th>
-                <th>Result</th>
-            </tr>
-
-            {% for result in leaderboard %}
-
-                {% if result.get("qset_id") == qset.id %}
+            {% if qset.is_active %}
+                <h3><a href="{{ url_for('take_quiz', quiz=qset.id) }}">{{ qset.title }}</a></h3>
+                <table class="table">
                     <tr>
-                        <td style='font-size: large'>{{ result.get("user") }}</td>
-                        <td style='font-size: large'>{{ result.get("top_mark") }}/{{ result.get("out_of") }}</td>
+                        <th>Username</th>
+                        <th>Result</th>
                     </tr>
-
-                {% endif %}
-
-            {% endfor %}
-
-        </table>
-        <br><br>
+        
+                    {% for result in leaderboard %}
+        
+                        {% if result.get("qset_id") == qset.id %}
+                            <tr>
+                                <td style='font-size: large'>{{ result.get("user") }}</td>
+                                <td style='font-size: large'>{{ result.get("top_mark") }}/{{ result.get("out_of") }}</td>
+                            </tr>
+        
+                        {% endif %}
+        
+                    {% endfor %}
+        
+                </table>
+                <br><br>
+            {% endif %}
         {% endfor %}
     </div>
 

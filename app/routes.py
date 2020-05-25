@@ -1,12 +1,15 @@
 from flask import render_template, flash, redirect, url_for, request
-from flask_login import current_user, login_user, logout_user
+from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 from datetime import datetime
+import os
+import secrets
+from PIL import Image
 
 from app import app
 from app import db
 from app.models import User, Qset, Question, Multichoice, Results, Attempts
-from app.forms import LoginForm, NewQuizForm, TakeQuizForm
+from app.forms import LoginForm, NewQuizForm, TakeQuizForm, UpdateAccountForm
 
 @app.route('/')
 @app.route('/index')
@@ -24,7 +27,11 @@ def login():
     if form.validate_on_submit():
         user = User.query.filter_by(username=form.username.data).first()
         if user is None or not user.check_password(form.password.data):
+<<<<<<< HEAD
             return redirect(url_for('login', access=0))
+=======
+            return redirect(url_for('login'))
+>>>>>>> origin/master
 
         login_user(user, remember=form.remember_me.data)
         next_page = request.args.get('next')
@@ -42,6 +49,40 @@ def logout():
     return redirect(url_for('index'))
 
 
+@app.route("/account", methods=['GET', 'POST'])
+@login_required
+def account():
+    form = UpdateAccountForm()
+    if form.validate_on_submit():
+        if form.picture.data:
+            picture_file = save_picture(form.picture.data)
+            current_user.image_file = picture_file
+        current_user.username = form.username.data
+        current_user.email = form.email.data
+        db.session.commit()
+        return redirect(url_for('account'))
+    elif request.method == 'GET':
+        form.username.data = current_user.username
+        form.email.data = current_user.email
+    image_file = url_for('static', filename='profile_pics/' + current_user.image_file)
+    return render_template('account.html', title='Account',
+                           image_file=image_file, form=form)
+
+
+def save_picture(form_picture):
+    random_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + f_ext
+    picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn)
+
+    output_size = (125, 125)
+    i = Image.open(form_picture)
+    i.thumbnail(output_size)
+    i.save(picture_path)
+
+    return picture_fn
+
+
 # ------------------------
 # Quiz routes
 # ------------------------
@@ -55,17 +96,17 @@ def view_quizes():
     user_attempts = []
     for q in quizes:
         attempts_check = Attempts.query.filter_by(qset_id=q.id).all()
-        user_check = Attempts.query.filter_by(qset_id=q.id, user_id=current_user.id).all()
         attempts.append(len(attempts_check))
-        user_attempts.append(len(user_check))
-        print(len(user_check))
-
+        if not current_user.is_anonymous:
+            user_check = Attempts.query.filter_by(qset_id=q.id, user_id=current_user.id).all()
+            user_attempts.append(len(user_check))
 
     return render_template('view_quizes.html', title='Available Quizes', quizes=quizes, attempts=attempts, user_attempts=user_attempts)
 
 
 # Route to take user to a quiz
 @app.route('/take_quiz', methods=['GET', 'POST'])
+@login_required
 def take_quiz():
     # Get current user PK
     user_id = current_user.get_id()
@@ -348,7 +389,12 @@ def admin_newquiz():
                 question_id = question.id
 
                 ans = form.answers[i]
-                correct = int(ans.correct.data)
+                print("{}".format(ans))
+                correct = 0
+                try:
+                    correct = int(ans.correct.data)
+                except:
+                    correct = 0
                 set_correct = False
                 # Adding multichoice answer 1 to Multichoice table
                 print('Adding answer 1: {}'.format(ans.answer1.data))
@@ -385,3 +431,28 @@ def admin_newquiz():
         return redirect(url_for('admin'))
 
     return render_template('/admin/new_quiz.html', title='Create a new Quiz!', form=form)
+
+
+@app.route('/admin/admin_quizmanagement', methods=['GET', 'POST'])
+def admin_quizmanagement():
+    if current_user.is_anonymous or current_user.is_admin != True:
+        return redirect(url_for('index')) 
+    
+    if request.args.get('activate') == 'False':
+        activate = False
+        id = int(request.args.get('qset_id'))
+        qset = Qset.query.get(id)
+        qset.is_active = activate
+        db.session.add(qset)
+        db.session.commit()
+    elif request.args.get('activate') == 'True':
+        activate = True
+        id = int(request.args.get('qset_id'))
+        qset = Qset.query.get(id)
+        qset.is_active = activate
+        db.session.add(qset)
+        db.session.commit()
+
+    qsets = Qset.query.all()
+
+    return render_template('/admin/admin_quizmanagement.html', title='Quiz Management', qsets=qsets)

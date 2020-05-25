@@ -15,7 +15,7 @@
             </li>
             {% if not current_user.is_anonymous %}
                 <li>
-                    <a href="#">
+                    <a href="{{ url_for('admin_quizmanagement') }}">
                         <span class="glyphicon glyphicon-tower pull-right" style='color: orange'></span> Quiz Management 
                     </a>
                 </li>

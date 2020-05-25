@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+
+
+{% block content %}
+<link rel="stylesheet" href="../static/css/main_style.css">
+
+<div class="jumbotron" id='myTitle'>
+    <h2>Quiz Management</h2>
+</div>
+
+<div class="row">
+
+    <div class="col-sm-3">
+        {% include '/admin/admin_menu.html' %} 
+    </div>
+
+    <div class="col-sm-6">
+        <div class="table-responsive">
+            <table class="table">
+                <tr>
+                    <th>Question Set</th>
+                    <th>Active</th>
+                    <th>Action</th>
+                </tr>
+
+                {% for q in qsets %}
+                    <tr>
+                        <td>{{ q.title }}</td>
+                        <td>{{ q.is_active }}</td>
+                        {% if q.is_active %}
+                        <td id='quizBar'>
+                            <a href="{{ url_for('admin_quizmanagement', qset_id=q.id, activate=False) }}" class="btn btn-info btn-sm" style="background: red;">
+                            <span class="glyphicon glyphicon-arrow-left"></span> Deactivate Quiz</a>
+                        </td>
+                        {% else %}
+                        <td id='quizBar'>
+                            <a href="{{ url_for('admin_quizmanagement', qset_id=q.id, activate=True) }}" class="btn btn-info btn-sm" style="background: green;">
+                            <span class="glyphicon glyphicon-arrow-left"></span> Activate Quiz</a>
+                        </td>
+                        {% endif %}
+                    </tr>
+                {% endfor %}
+
+            </table>
+        </div>
+    </div>
+
+    <div class="col-sm-3">
+
+    </div>
+
+{% endblock %}

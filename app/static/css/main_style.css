@@ -214,6 +214,21 @@ tr:hover
     }
 }
 
+#homepageText
+{
+    background-image: linear-gradient(to bottom right, black, #222);
+    padding: 10px 0;
+    display: inline;
+    margin: auto;
+}
+
+#homepageText h4
+{
+    text-align: center;
+    margin: 10%;
+}
+
+
 /* Right hand quiz side bar on index page */
 #quizBar
 {

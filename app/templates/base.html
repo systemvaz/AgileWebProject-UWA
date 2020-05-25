@@ -31,7 +31,7 @@
 
               {% if current_user.is_anonymous %}
               <ul class='nav navbar-nav navbar-right'>
-                  <li><a href="{{ url_for('signup') }}">Signup</a></li>
+                  <li><a href="{{ url_for('signup') }}"><span class='glyphicon glyphicon-hand-up'></span>&nbsp;Signup</a></li>
               </ul>
               {% endif %}
 

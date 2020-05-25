@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="jumbotron" id='myTitle'>
+    <h2>User Management</h2>
+</div>
+
+<div id='moreFlames'></div>
+
+<div class="row">
+
+    <div class="col-sm-3">
+        {% include '/admin/admin_menu.html' %}
+    </div>
+
+    <div class="col-sm-6">
+        {% for user in users%}
+        <p>{{user.username}}</p>
+        {%if user.is_active%}
+        <p> I'm Active</p>
+        {%else%}
+        <p>I'm Inactive</p>
+        {%endif%}
+        {% endfor%}
+        
+
+    </div>
+
+    <div class="col-sm-3">
+        
+
+    </div>
+
+
+
+{% endblock %}

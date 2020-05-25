@@ -1,12 +1,15 @@
 from flask import render_template, flash, redirect, url_for, request
-from flask_login import current_user, login_user, logout_user
+from flask_login import current_user, login_user, logout_user, login_required
 from werkzeug.urls import url_parse
 from datetime import datetime
+import os
+import secrets
+from PIL import Image
 
 from app import app
 from app import db
 from app.models import User, Qset, Question, Multichoice, Results, Attempts
-from app.forms import LoginForm, NewQuizForm, TakeQuizForm, RegistrationForm
+from app.forms import LoginForm, NewQuizForm, TakeQuizForm, RegistrationForm, UpdateAccountForm
 
 @app.route('/')
 @app.route('/index')
@@ -42,7 +45,8 @@ def signup():
         return redirect(url_for('index'))
     form = RegistrationForm()
     if form.validate_on_submit():
-        user = User(username=form.username.data, first_name= form.firstname.data, last_name = form.lastname.data, email=form.email.data,is_admin = 0, is_active=1 )
+        user = User(username=form.username.data, first_name= form.firstname.data, 
+        last_name = form.lastname.data, email=form.email.data,is_admin = 0, is_active=1 )
         user.set_password(form.password.data)
         db.session.add(user)
         db.session.commit()
@@ -53,6 +57,48 @@ def signup():
 def logout():
     logout_user()
     return redirect(url_for('index'))
+
+
+@app.route("/account", methods=['GET', 'POST'])
+@login_required
+def account():
+    form = UpdateAccountForm()
+    if current_user.is_admin and not request.args.get("user") == None:
+        userid = request.args.get("user")
+        user = User.query.get(int( userid))
+    else :
+        user = current_user
+    if form.validate_on_submit():
+        if form.picture.data:
+            picture_file = save_picture(form.picture.data)
+            user.image_file = picture_file
+        user.username = form.username.data
+        user.email = form.email.data
+        db.session.commit()
+        return redirect(url_for('account'))
+    elif request.method == 'GET':
+        form.username.data = user.username
+        form.email.data = user.email
+    if not user.image_file is None:
+        image_file = url_for('static', filename='profile_pics/' + user.image_file)
+    else:
+        image_file = None
+    return render_template('account.html', title='Account',
+                           image_file=image_file, form=form, user = user)
+
+
+def save_picture(form_picture):
+    random_hex = secrets.token_hex(8)
+    _, f_ext = os.path.splitext(form_picture.filename)
+    picture_fn = random_hex + f_ext
+    picture_path = os.path.join(app.root_path, 'static/profile_pics', picture_fn)
+
+    output_size = (125, 125)
+    i = Image.open(form_picture)
+    i.thumbnail(output_size)
+    i.save(picture_path)
+
+    return picture_fn
 
 
 # ------------------------
@@ -68,11 +114,10 @@ def view_quizes():
     user_attempts = []
     for q in quizes:
         attempts_check = Attempts.query.filter_by(qset_id=q.id).all()
-        user_check = Attempts.query.filter_by(qset_id=q.id, user_id=current_user.id).all()
         attempts.append(len(attempts_check))
-        user_attempts.append(len(user_check))
-        print(len(user_check))
-
+        if not current_user.is_anonymous:
+            user_check = Attempts.query.filter_by(qset_id=q.id, user_id=current_user.id).all()
+            user_attempts.append(len(user_check))
 
     return render_template('view_quizes.html', title='Available Quizes', quizes=quizes, attempts=attempts, user_attempts=user_attempts)
 
@@ -399,8 +444,19 @@ def admin_newquiz():
 
     return render_template('/admin/new_quiz.html', title='Create a new Quiz!', form=form)
 
-@app.route('/admin_users')
+@app.route('/admin_users', methods=['GET', 'POST'])
 def admin_users():
+    user_id = request.args.get("user")
     users = User.query.all()
-
+    active = request.args.get("active")
+    if active is not None:
+        if active == "False":
+            change_user = User.query.get(int(user_id))
+            change_user.is_active = False
+        if active == "True":
+            change_user = User.query.get(int(user_id))
+            change_user.is_active = True
+        db.session.add(change_user)
+        db.session.commit()
     return render_template("/admin/admin_users.html", title = "User Management",users=users)
+

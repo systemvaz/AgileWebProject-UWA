@@ -101,6 +101,7 @@ def view_quizes():
 
 # Route to take user to a quiz
 @app.route('/take_quiz', methods=['GET', 'POST'])
+@login_required
 def take_quiz():
     # Get current user PK
     user_id = current_user.get_id()
@@ -429,6 +430,8 @@ def admin_newquiz():
 
 @app.route('/admin/admin_quizmanagement', methods=['GET', 'POST'])
 def admin_quizmanagement():
+    if current_user.is_anonymous or current_user.is_admin != True:
+        return redirect(url_for('index')) 
     
     if request.args.get('activate') == 'False':
         activate = False
